@@ -2,9 +2,9 @@ import base64
 import vertexai
 from vertexai.generative_models import GenerativeModel, Part, SafetySetting
 
-
 def generate(filepath: str) -> str:
-    vertexai.init(project="optimum-phalanx-439708-n4", location="europe-west2")
+    project_name = "optimum-phalanx-439708-n4"
+    vertexai.init(project=project_name, location="europe-west2")
     model = GenerativeModel(
         "gemini-1.5-pro-001",
     )
@@ -42,16 +42,21 @@ def generate(filepath: str) -> str:
             threshold=SafetySetting.HarmBlockThreshold.OFF
         ),
         ]
+    
+    checktokens = model.count_tokens([document1, text1])
 
-    responses = model.generate_content(
-    [document1, text1],
-    generation_config=generation_config,
-    safety_settings=safety_settings,
-    stream=True,
-    )
+    if checktokens.total_tokens > 2000000:
+        return "The input is too long. Please try again with a shorter input:" + filepath
+    else:
+        responses = model.generate_content(
+        [document1, text1],
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        stream=True,
+        )
 
-    text_responses = [response.text for response in responses]
-    output = "".join(text_responses)
+        text_responses = [response.text for response in responses]
+        output = "".join(text_responses)
 
     # for response in responses:
     #     print(response.text, end="")
