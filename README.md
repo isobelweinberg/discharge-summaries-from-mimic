@@ -5,14 +5,14 @@
 This repository creates LLM-generated discharge summaries from electronic health record data from the [MIMIC-IV demo dataset](https://physionet.org/content/mimic-iv-demo/2.2/). The objective of the project was to see how well an LLM could perform at generating discharge summaries from electronic health record data. The input dataset contains lists of patients, admissions, lab results, prescriptions and procedures, but no free text clinical notes. I wanted to see whether an LLM could reconstruct the narrative of an admission using only the key events of the admission. 
 
 ## Get the data
-The dataset was downloaded from [physionet](https://physionet.org/content/mimic-iv-demo/2.2/) to /data. The data is subdivided into hospital (/hosp) and ICU (/icu) data. For this project, I have used /hosp only.
+The dataset was downloaded from [physionet](https://physionet.org/content/mimic-iv-demo/2.2/) to `/data`. The dataset is subdivided into hospital (`/hosp`) and ICU (`/icu`) data. For this project, I have used the data in `/hosp` only.
 
 ## Repository contents
 - `extract_files.py` - extract the compressed files
 - `data_to_database.py` - read files into an SQL database and save
 - `find-headings.ipynb` - explore the columns in the database
 - `collate_data_over_subjects.py` - create a text file containing all the records for each patient
-- `generate-model-inputs.ipynb` - functions to use the above modules
+- `generate-model-inputs.ipynb` - use the above modules to create the model input files
 - `pass_to_model.py` and `pass_to_model.ipynb` - send the data to gemini
 - `run.py` - iterate over the subject files and send each one to the model 
 
@@ -76,10 +76,10 @@ History of presenting complaint, Hospital course, Discharge medications, Dischar
 plan
 ```
 
-I also experimented with model temperature (a measure of the model's creativity) and in the end settled on the default value of 1 (scale from 0 to 2.) 
+I also experimented with model temperature (a measure of the model's creativity) and settled on the default value of 1 (scale from 0 to 2.) 
 
 ## Input data
-Alongisde the prompts above, I passed the model a data file for each patient. This consisted of all the data in the database pertaining to that patient. I did not supply the model with headings or translate ICD-10 codes. Here is an example of ten lines of input for one patient:
+Alongisde the prompts above, I passed the model a data file for each patient. This consisted of all the data in the database pertaining to that patient. I did not supply the model with headings or translate ICD codes. Here is an example of ten lines of input for one patient:
 
 ```
 (10000032, 22595853, '2180-05-06 22:23:00', '2180-05-07 17:15:00', None, 'URGENT', 'P874LG', 'TRANSFER FROM HOSPITAL', 'HOME', 'Other', 'ENGLISH', 'WIDOWED', 'WHITE', '2180-05-06 19:17:00', '2180-05-06 23:30:00', 0)
@@ -97,9 +97,9 @@ Alongisde the prompts above, I passed the model a data file for each patient. Th
 ## Example output for 3 patients
 Here I display the model outputs for three patients. The input was kept the same but I varied the model instruction, and I show the output achieved with short prompt vs the long prompt (see above). 
 
-A note on dates: for anonymisation purposes, for each patient, the dates in the MIMIC dataset have a random offset added to them, which is why the years look implausible. 
+A note on dates: for anonymisation purposes, the dates in the MIMIC dataset have a random offset added to them for each patient, which is why the years look implausible. 
 
-### Patient 10000032 (first admission)
+## Patient 10000032 (first admission)
 Example discharge summary with short prompt:
 
 > ## Discharge Summary: Admission ID 22595853
@@ -171,7 +171,7 @@ Example output with long prompt:
 > **Discharge plan**
 > The patient was discharged home.  
 
-### Patient 10001217 (first admission)
+## Patient 10001217 (first admission)
 Short prompt:
 
 > ## Discharge Summary - Admission 1 (24597018)
@@ -245,7 +245,7 @@ Long prompt:
 > **Discharge plan**
 > Home health care.
 
-### Patient 10001725 (first admission)
+## Patient 10001725 (first admission)
 
 Short prompt:
 
@@ -293,12 +293,12 @@ Long prompt:
 > 
 
 ## Conclusions
-- Gemini can extract, from unstructured data, the key information for a discharge summary. 
-- Discharge summaries tend to look superficially convincing but sometimes the underlying clinical narrative is low-quality e.g. unimportant or irrelevant information is included; not drawing out the overall clinical narrative. There are errors in other sections too e.g. inpatient medicines being wrongly listed as discharge medications. 
-- These discharge summaries were written only from event data; no patient notes were included (this is a limitation of the mimic demo dataset). Given this, the LLM has performed very well in condensing the information into narrative form. It would be interesting to see performance with a dataset that included clinical notes.
-- The model did not need to be given a structure in order to output the clinical information in the style of a discharge summary, with structured headings. It can be seen that the model produced these kind of outputs in response to the short prompt as well as the long prompt; the short prompt does not impose and structure on the ouput. Interestingly, to make the model produce output in this style, prompts had to specify that a 'discharge summary' was required. Instructly the model to produce a 'clinical narrative' or 'clinical summary' did not give any structured headings. 
-- It can be seen that, whilst the short prompt produces a discharge-style summary with headings, the exact structure of the output fluctuates. Using the long prompt to specify a structure the model should use allows consistency.
-- Interestingly, giving a longer prompt which included more specific instructions about the output the model should produce tends to make the model poorer at the core task: providing a useful summary of the admission. For instance, compare this, produced in response to the short prompt:
+- Gemini could extract, from unstructured data, the key information for a discharge summary. 
+- Discharge summaries tended to look superficially convincing but sometimes the underlying clinical narrative was low-quality e.g. unimportant or irrelevant information was included; the overall narrative was not convincing. There were errors in other sections too e.g. inpatient medicines being wrongly listed as discharge medications. 
+- These discharge summaries were written only from event data; no patient notes were included (this is a limitation of the MIMIC demo dataset). Given this, the LLM has performed very well in condensing the information into narrative form. It would be interesting to see performance with a dataset that included clinical notes.
+- The model did not need to be given a structure in order to output the clinical information in the style of a discharge summary, with structured headings. It can be seen that the model produced these kind of outputs in response to the short prompt as well as the long prompt; the short prompt does not impose any structure on the ouput. Interestingly, to make the model produce output in this style, prompts had to specify that a 'discharge summary' was required. Instructly the model to produce a 'clinical narrative' or 'clinical summary' did not give any structured headings. 
+- It can be seen that, whilst the short prompt produced a discharge-style summary with headings, the exact structure of the output fluctuated. Using the long prompt to specify a structure the model should use gave consistency.
+- Interestingly, giving a longer prompt which included more specific instructions about the output the model should produce tended to make the model poorer at the core task: providing a useful summary of the admission. For instance, compare this, produced in response to the short prompt:
 
 > **History of Present Illness:**
 > 
@@ -314,6 +314,6 @@ With this, produced in response to the long prompt:
 >
 > **Hospital course** The patient was admitted to the Surgical Intensive Care Unit following attendance in the Emergency Department. She underwent a craniotomy. Her sodium level dropped to 123 mmol/L but was corrected. She also had a blood culture which showed no growth. There was growth of Fusobacterium nucleatum in an abscess sample and she completed a course of intravenous vancomycin and ceftriaxone.
 
-The first summary is signficantly better. It does not include information of little relevance (negative blood culutre, sodium level). Most importantly, it creates a a more useful summary of the information, extracting meaning from the information ("she was started on IV antibiotics for a suspected abscess containing streptococcus anginosus") rather than summarising it without overlying inference ("There was growth of Fusobacterium nucleatum in an abscess sample and she completed a course of intravenous vancomycin and ceftriaxone.")
+The first summary is signficantly better. It does not include information of little relevance (negative blood culutre, sodium level). Most importantly, it creates a more useful summary of the information, extracting meaning from the information ("she was started on IV antibiotics for a suspected abscess containing streptococcus anginosus") rather than summarising it without overlying inference ("There was growth of Fusobacterium nucleatum in an abscess sample and she completed a course of intravenous vancomycin and ceftriaxone.")
 
 I observed this pattern fairly consistently (although there are some cases where the longer prompt produces a better narrative than the short prompt - see the third example patient). Interestingly, I found that the precise nature of the long prompt did not seem to matter - adding any additional instructions tending to make the clinical narrative deteriorate. It's not obvious why this should be: perhaps giving the model a longer prompt constrains its freedom in narrating a discharge summary. 
