@@ -50,8 +50,8 @@ Hospital course:
 Discharge medications:
 Discharge plan:
 ```
-
-In the end, I settled on generating output from two prompts, a short one and a long one. This was the short prompt:
+## Prompts used
+I felt that the model tended to generate better discharge summaries in response to a short prompt, and atttempting to improve the model output with extra instructions actually caused the clinical narrative to deteriorate. In the end, I settled on directly comparing output from two prompts, a short one and a long one. This was the short prompt:
 
 ```
 Please write a discharge summary for this patient based on the data supplied.
@@ -79,7 +79,7 @@ plan
 I also experimented with model temperature (a measure of the model's creativity) and in the end settled on the default value of 1 (scale from 0 to 2.) 
 
 ## Input data
-Alongisde the prompts above, I passed the model a datafile for each patient. This consisted of all the data in the database pertaining to that patient. I did not supply the model with headings or translate ICD-10 codes. Here is an example of ten lines of input for one patient:
+Alongisde the prompts above, I passed the model a data file for each patient. This consisted of all the data in the database pertaining to that patient. I did not supply the model with headings or translate ICD-10 codes. Here is an example of ten lines of input for one patient:
 
 ```
 (10000032, 22595853, '2180-05-06 22:23:00', '2180-05-07 17:15:00', None, 'URGENT', 'P874LG', 'TRANSFER FROM HOSPITAL', 'HOME', 'Other', 'ENGLISH', 'WIDOWED', 'WHITE', '2180-05-06 19:17:00', '2180-05-06 23:30:00', 0)
@@ -291,3 +291,29 @@ Long prompt:
 > - Albuterol 0.083% Neb Soln eight hourly as required
 > **Discharge plan:** The patient was discharged home with a plan to follow up with her general practitioner. 
 > 
+
+## Conclusions
+- Gemini can extract, from unstructured data, the key information for a discharge summary. 
+- Discharge summaries tend to look superficially convincing but sometimes the underlying clinical narrative is low-quality e.g. unimportant or irrelevant information is included; not drawing out the overall clinical narrative. There are errors in other sections too e.g. inpatient medicines being wrongly listed as discharge medications. 
+- These discharge summaries were written only from event data; no patient notes were included (this is a limitation of the mimic demo dataset). Given this, the LLM has performed very well in condensing the information into narrative form. It would be interesting to see performance with a dataset that included clinical notes.
+- The model did not need to be given a structure in order to output the clinical information in the style of a discharge summary, with structured headings. It can be seen that the model produced these kind of outputs in response to the short prompt as well as the long prompt; the short prompt does not impose and structure on the ouput. Interestingly, to make the model produce output in this style, prompts had to specify that a 'discharge summary' was required. Instructly the model to produce a 'clinical narrative' or 'clinical summary' did not give any structured headings. 
+- It can be seen that, whilst the short prompt produces a discharge-style summary with headings, the exact structure of the output fluctuates. Using the long prompt to specify a structure the model should use allows consistency.
+- Interestingly, giving a longer prompt which included more specific instructions about the output the model should produce tends to make the model poorer at the core task: providing a useful summary of the admission. For instance, compare this, produced in response to the short prompt:
+
+> **History of Present Illness:**
+> 
+> The patient is a 55 year old female who presented to the Emergency Department via ambulance on 18/11/2157 with altered mental status. Initial workup revealed encephalopathy and a history of recent craniotomy. She was admitted to the Surgical Intensive Care Unit (SICU) for close monitoring and further evaluation. During her SICU stay, she required supplemental oxygen and was started on IV antibiotics for a suspected abscess containing streptococcus anginosus.
+> 
+> **Hospital Course:**
+>
+> The patient's mental status gradually improved with treatment. She was transitioned from IV antibiotics to oral Metronidazole and Ceftriaxone and was able to tolerate a regular diet. Physical and occupational therapy were consulted to assist with her functional recovery.
+
+With this, produced in response to the long prompt:
+
+> **History of presenting complaint** The patient was admitted to hospital via the Emergency Department on 18/11/2157. She presented with headache.
+>
+> **Hospital course** The patient was admitted to the Surgical Intensive Care Unit following attendance in the Emergency Department. She underwent a craniotomy. Her sodium level dropped to 123 mmol/L but was corrected. She also had a blood culture which showed no growth. There was growth of Fusobacterium nucleatum in an abscess sample and she completed a course of intravenous vancomycin and ceftriaxone.
+
+The first summary is signficantly better. It does not include information of little relevance (negative blood culutre, sodium level). Most importantly, it creates a a more useful summary of the information, extracting meaning from the information ("she was started on IV antibiotics for a suspected abscess containing streptococcus anginosus") rather than summarising it without overlying inference ("There was growth of Fusobacterium nucleatum in an abscess sample and she completed a course of intravenous vancomycin and ceftriaxone.")
+
+I observed this pattern fairly consistently (although there are some cases where the longer prompt produces a better narrative than the short prompt - see the third example patient). Interestingly, I found that the precise nature of the long prompt did not seem to matter - adding any additional instructions tending to make the clinical narrative deteriorate. It's not obvious why this should be: perhaps giving the model a longer prompt constrains its freedom in narrating a discharge summary. 
