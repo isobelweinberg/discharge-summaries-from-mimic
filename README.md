@@ -22,11 +22,10 @@ Google's Gemini 1.5 pro model was used via Vertex AI. This LLM was selected for 
 ## Prompt optimisation
 I experimented with the prompt to the LLM to get the best output. I tried techniques included giving the model a template to follow. Here are some example prompts I tried:
 
-``
-`You are a doctor writing a summary of a patient's admission or admissions. Please use the information given to write a clinical narrative for the patient relating to their hospital admission. If they had more than one hospital admission please deal with these separately. Please give the key diagnosis of the admission and other issues. Give each of these on a new line. Include relevant test findings in a succinct manner e.g. do not include antibiotic sensitivities for a microbiolgy result. Where dates are included, give these in British English format (dd/mm/yyyy). Do not include timestamps. Do not include diagnosis codes. Please start your answer with the patient's gender, age and past medical history.
-``
+
+`You are a doctor writing a summary of a patient's admission or admissions. Please use the information given to write a clinical narrative for the patient relating to their hospital admission. If they had more than one hospital admission please deal with these separately. Please give the key diagnosis of the admission and other issues. Give each of these on a new line. Include relevant test findings in a succinct manner e.g. do not include antibiotic sensitivities for a microbiolgy result. Where dates are included, give these in British English format (dd/mm/yyyy). Do not include timestamps. Do not include diagnosis codes. Please start your answer with the patient's gender, age and past medical history.`
+
 `
-```
 Please write a discharge summary for this patient based on the data supplied. Write one discharge summary for each admission. 
 Give any dates in the UK format (dd/mm/yyyy). Do not comment on how the discharge summary could be improved.
 Use the following template:
@@ -40,7 +39,8 @@ History of presenting complaint:
 Hospital course:
 Discharge medications:
 Discharge plan:
-```
+`
+
 In the end, I settled on generating output from two prompts, a short one and a long one. This was the short prompt:
 
 ```
