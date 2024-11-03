@@ -2,7 +2,7 @@ import base64
 import vertexai
 from vertexai.generative_models import GenerativeModel, Part, SafetySetting
 
-def generate(filepath: str) -> str:
+def generate(filepath: str, promptcontext: str) -> str:
     project_name = "optimum-phalanx-439708-n4"
     vertexai.init(project=project_name, location="europe-west2")
     model = GenerativeModel(
@@ -16,7 +16,8 @@ def generate(filepath: str) -> str:
         mime_type="text/plain",
         data=input,
     )
-    text1 = """Please write a discharge summary for this patient based on the data supplied. Write one discharge summary for each admission. Give any dates in UK format (dd/mm/yyyy)."""
+    
+    text1 = promptcontext
 
     generation_config = {
         "max_output_tokens": 8192,
