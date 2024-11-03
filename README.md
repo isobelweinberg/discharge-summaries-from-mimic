@@ -34,9 +34,10 @@ include timestamps. Do not include diagnosis codes. Please start your answer wit
 patient's gender, age and past medical history.    
 ```
 
-
-Please write a discharge summary for this patient based on the data supplied. Write one discharge summary for each admission. 
-Give any dates in the UK format (dd/mm/yyyy). Do not comment on how the discharge summary could be improved.
+```
+Please write a discharge summary for this patient based on the data supplied.
+Write one discharge summary for each admission.  Give any dates in the UK format
+(dd/mm/yyyy). Do not comment on how the discharge summary could be improved.
 Use the following template:
 Discharge Summary
 Patient ID:
@@ -48,16 +49,31 @@ History of presenting complaint:
 Hospital course:
 Discharge medications:
 Discharge plan:
-</code>
+```
 
 In the end, I settled on generating output from two prompts, a short one and a long one. This was the short prompt:
 
 ```
-Please write a discharge summary for this patient based on the data supplied. Write one discharge summary for each admission. Give any dates in UK format (dd/mm/yyyy).
+Please write a discharge summary for this patient based on the data supplied.
+Write one discharge summary for each admission. Give any dates in UK format
+(dd/mm/yyyy).
 ```
+
 And this was the long one:
+
 ```
-You are a doctor writing a discharge summary of a patient's admission or admissions. Please use the information given to write a clinical narrative for the patient relating to their hospital admission. If they had more than one hospital admission please deal with these separately. Please give the key diagnosis of the admission and other issues. Give each of these on a new line. Include relevant test findings in a succinct manner e.g. do not include antibiotic sensitivities for a microbiolgy result. Where dates are included, give these in British English format (dd/mm/yyyy). Do not include timestamps. Do not include diagnosis codes. Use the following headings and use markdown formatting to make each one bold and start on a new line: Patient ID, Patient Age, Admission Date, Discharge Date, Diagnosis, Other issues during admission, History of presenting complaint, Hospital course, Discharge medications, Discharge plan
+You are a doctor writing a discharge summary of a patient's admission or
+admissions. Please use the information given to write a clinical narrative for the patient
+relating to their hospital admission. If they had more than one hospital admission
+please deal with these separately. Please give the key diagnosis of the admission and
+other issues. Give each of these on a new line. Include relevant test findings in a
+succinct manner e.g. do not include antibiotic sensitivities for a microbiolgy result.
+Where dates are included, give these in British English format (dd/mm/yyyy). Do not
+include timestamps. Do not include diagnosis codes. Use the following headings and use
+markdown formatting to make each one bold and start on a new line: Patient ID, Patient
+Age, Admission Date, Discharge Date, Diagnosis, Other issues during admission,
+History of presenting complaint, Hospital course, Discharge medications, Discharge
+plan
 ```
 
 I also experimented with model temperature (a measure of the model's creativity) and in the end settled on the default value of 1 (scale from 0 to 2.) 
