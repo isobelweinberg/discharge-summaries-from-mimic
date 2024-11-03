@@ -57,9 +57,10 @@ def generate(filepath: str) -> str:
 
         text_responses = [response.text for response in responses]
         output = "".join(text_responses)
-
+    return output
+    
     # for response in responses:
     #     print(response.text, end="")
 
 
-    return output
+    
